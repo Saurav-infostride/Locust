@@ -8,7 +8,7 @@ class MyHTTPCat(TaskSet):
         self.client.get("/200")
         print("Get Status of 200")
 
-    '''The problem in Nested TaskSet is that once it gets into the Nested TaskSet, it keeps executing
+    '''The problem in Nested TaskSetClass is that once it gets into the Nested TaskSetClass, it keeps executing
         Nested class, it never goes back to parent class.
         So, in order to execute out of this class, we have to use "self.interrupt()"
         "reschedule=False", will add the breath time between parent and nested class '''
