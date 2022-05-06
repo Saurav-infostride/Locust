@@ -1,10 +1,9 @@
-import random
+from locust import HttpUser, SequentialTaskSet, task, constant, log
 import re
+import random
 
-from locust import HttpUser, SequentialTaskSet, task, constant
 
-
-class PetStore(SequentialTaskSet):
+class SauceDemo(SequentialTaskSet):
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -16,6 +15,7 @@ class PetStore(SequentialTaskSet):
         with self.client.get("", catch_response=True, name="HomePage") as response:
             if "Welcome to JPetStore 6" in response.text and response.elapsed.total_seconds() < 2.0:
                 response.success()
+                # log.setup_logging("Testing")
             else:
                 response.failure("Home page took too long to load and/or text check has failed.")
 
@@ -30,7 +30,7 @@ class PetStore(SequentialTaskSet):
                     response.failure("Products check failed.")
                     break
             try:  # re below is regular expression
-                jsession = re.search(r"jsessionid=(.1+?)\?", response.text)  # Extracting the jsession id
+                jsession = re.search(r"jsessionid=(.+?)\?", response.text)  # Extracting the jsession id
                 self.jsession = jsession.group(1)
             except AttributeError:
                 self.jsession = ""
@@ -39,7 +39,7 @@ class PetStore(SequentialTaskSet):
     def signin_page(self):
         self.client.cookies.clear()
         url = "/actions/Account.action;jsessionid=" + self.jsession + "?signonForm="
-        with self.client.get(url, catch_response=True, name="SignInPage") as response:
+        with self.client.get(url, catch_response=True, name="T20_SignInPage") as response:
             if "Please enter your username and password." in response.text:
                 response.success()
             else:
@@ -48,10 +48,10 @@ class PetStore(SequentialTaskSet):
     @task
     def login(self):
         self.client.cookies.clear()
-        url = "/actions/Account.action"
+        url = "/login?returnurl=%2F"
         data = {
-            "username": "j2ee",
-            "password": "j2ee",
+            "username": "standard_user",
+            "password": "secret_sauce",
             "signon": "Login"
         }
         with self.client.post(url, name="SignIn", data=data, catch_response=True) as response:
@@ -66,29 +66,28 @@ class PetStore(SequentialTaskSet):
                     self.random_product = ""
             else:
                 response.failure("Sign in Failed")
-
-    @task
-    def random_product_page(self):
-        url = "/actions/Catalog.action?viewCategory=&categoryId=" + self.random_product  # sending the product name in
-        # url
-        name = "T40_" + self.random_product + "_Page"  # sending product name
-        with self.client.get(url, name=name, catch_response=True) as response:
-            if self.random_product in response.text:
-                response.success()
-            else:
-                response.failure("Product page not loaded")
-
-    @task
-    def sign_out(self):
-        with self.client.get("/actions/Account.action?signoff=", name="SignOff", catch_response=True) as response:
-            if response.status_code == 200:
-                response.success()
-            else:
-                response.failure("Log off failed")
-        self.client.cookies.clear()
+    #
+    # @task
+    # def random_product_page(self):
+    #     url = "/actions/Catalog.action?viewCategory=&categoryId=" + self.random_product # sending the product name in url
+    #     name = "T40_" + self.random_product + "_Page"  # sending product name
+    #     with self.client.get(url, name=name, catch_response=True) as response:
+    #         if self.random_product in response.text:
+    #             response.success()
+    #         else:
+    #             response.failure("Product page not loaded")
+    #
+    # @task
+    # def sign_out(self):
+    #     with self.client.get("/actions/Account.action?signoff=", name="T50_SignOff", catch_response=True) as response:
+    #         if response.status_code == 200:
+    #             response.success()
+    #         else:
+    #             response.failure("Log off failed")
+    #     self.client.cookies.clear()
 
 
 class LoadTest(HttpUser):
-    host = "https://petstore.octoperf.com"
+    host = "https://www.saucedemo.com/"
     wait_time = constant(1)
-    tasks = [PetStore]
+    tasks = [SauceDemo]

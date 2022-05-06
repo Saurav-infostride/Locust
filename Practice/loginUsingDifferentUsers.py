@@ -1,4 +1,4 @@
-from locust import HttpLocust, TaskSet, task, between, HttpUser, constant
+from locust import TaskSet, task, HttpUser, constant
 
 UserName = [
     ("qamile1@gmail.com", "qamile"),
