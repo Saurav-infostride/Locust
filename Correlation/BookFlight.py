@@ -1,19 +1,8 @@
-# Complete booking flow
-####Launch new tours demo page - Create on_start task with get request
-####Login with registered credential - task name login_demotour with post request
-##verify through resp.text that user is on find flight page with post request
-####Click continue with default value - task name find_flight with post request
-##verify through resp.text that user is on select flight page with post request
-####Click continue with default value - task name select_flight with post request
-##verify through resp.text that user is on book flight page with post request
-####Fill form with data & click secure purchase- task name book_flight with post request
-##verify through resp.text that user gets booking confirmation with post request
-# Run test with --logfile option to generate log file
 
 from locust import TaskSet, task, between, HttpUser
 
 UserName = [
-    ("qamile1@gmail.com", "qa"),
+    ("Jacob@gmail.com", "qa"),
 ]
 
 
