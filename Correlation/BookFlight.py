@@ -21,7 +21,7 @@ class UserBehaviour(TaskSet):
 
     @task(4)
     def find_flight(self):
-        res2 = self.client.post("reservation.php")
+        res2 = self.client.get("reservation.php")
         print(res2.text)
 
 
